@@ -472,6 +472,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Helper function to safely encode HTML attributes
+  function encodeHTMLAttribute(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
@@ -568,8 +578,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
-        <button class="share-button tooltip" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}">
-          <span class="share-icon">🔗</span>
+        <button class="share-button tooltip" data-activity="${name}" data-description="${encodeHTMLAttribute(details.description)}" data-schedule="${encodeHTMLAttribute(formattedSchedule)}" aria-label="Share ${encodeHTMLAttribute(name)} activity">
+          <span class="share-icon" aria-hidden="true">🔗</span>
           <span class="tooltip-text">Share this activity</span>
         </button>
       </div>
@@ -826,7 +836,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create share data
     const shareTitle = `Join ${activityName} at Mergington High School!`;
     const shareText = `Check out ${activityName}: ${description}\nSchedule: ${schedule}`;
-    const shareUrl = window.location.href;
+    const shareUrl = `${window.location.href}#${encodeURIComponent(activityName)}`;
 
     // Check if Web Share API is available (native sharing on mobile)
     if (navigator.share) {
@@ -842,17 +852,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (error.name !== "AbortError") {
           console.error("Error sharing:", error);
           // Fallback to copy link
-          copyShareLink(shareUrl, activityName);
+          copyShareLink(shareUrl);
         }
       }
     } else {
       // Fallback: copy link to clipboard
-      copyShareLink(shareUrl, activityName);
+      copyShareLink(shareUrl);
     }
   }
 
   // Fallback function to copy share link
-  async function copyShareLink(url, activityName) {
+  async function copyShareLink(url) {
     try {
       await navigator.clipboard.writeText(url);
       showMessage(

@@ -292,7 +292,7 @@ section h3 {
 .share-button {
   background: linear-gradient(145deg, #4caf50, #388e3c);
   color: white;
-  padding: 6px 10px;
+  padding: 0;
   border: none;
   border-radius: 50%;
   cursor: pointer;
