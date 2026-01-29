@@ -568,6 +568,10 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <button class="share-button tooltip" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}">
+          <span class="share-icon">🔗</span>
+          <span class="tooltip-text">Share this activity</span>
+        </button>
       </div>
     `;
 
@@ -586,6 +590,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-button");
+    shareButton.addEventListener("click", () => {
+      handleShare(name, details.description, formattedSchedule);
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -809,6 +819,53 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       messageDiv.classList.add("hidden");
     }, 5000);
+  }
+
+  // Handle social sharing
+  async function handleShare(activityName, description, schedule) {
+    // Create share data
+    const shareTitle = `Join ${activityName} at Mergington High School!`;
+    const shareText = `Check out ${activityName}: ${description}\nSchedule: ${schedule}`;
+    const shareUrl = window.location.href;
+
+    // Check if Web Share API is available (native sharing on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+        showMessage("Activity shared successfully!", "success");
+      } catch (error) {
+        // User cancelled or error occurred
+        if (error.name !== "AbortError") {
+          console.error("Error sharing:", error);
+          // Fallback to copy link
+          copyShareLink(shareUrl, activityName);
+        }
+      }
+    } else {
+      // Fallback: copy link to clipboard
+      copyShareLink(shareUrl, activityName);
+    }
+  }
+
+  // Fallback function to copy share link
+  async function copyShareLink(url, activityName) {
+    try {
+      await navigator.clipboard.writeText(url);
+      showMessage(
+        "Link copied to clipboard! Share it with your friends.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showMessage(
+        "Unable to share. Please copy the URL from your browser.",
+        "error"
+      );
+    }
   }
 
   // Handle form submission
