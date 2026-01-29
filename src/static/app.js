@@ -8,18 +8,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (currentTheme === "dark") {
     document.body.classList.add("dark-mode");
     themeIcon.textContent = "☀️";
+    darkModeToggle.setAttribute("aria-label", "Switch to light mode");
   }
   
   // Toggle dark mode
   darkModeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
     
-    // Update icon and save preference
+    // Update icon, aria-label, and save preference
     if (document.body.classList.contains("dark-mode")) {
       themeIcon.textContent = "☀️";
+      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
       localStorage.setItem("theme", "dark");
     } else {
       themeIcon.textContent = "🌙";
+      darkModeToggle.setAttribute("aria-label", "Switch to dark mode");
       localStorage.setItem("theme", "light");
     }
   });
